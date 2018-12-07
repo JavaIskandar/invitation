@@ -18,6 +18,7 @@
         </div>
     @endif
     <div class="row sameheight-container">
+        <div class="col-lg-12" id="map" style="height: 300px;"></div>
         <div class="col-lg-6">
             <div class="card card-block">
                 <form role="form"
@@ -58,6 +59,10 @@
                         <textarea class="form-control" id="keterangan" placeholder=""
                                   name="keterangan">{{ $edit ? $undangan->keterangan : '' }}</textarea>
                     </div>
+                    <input type="number" class="form-control" id="lat" placeholder="" name="lat"
+                           value="">
+                    <input type="number" class="form-control" id="lng" placeholder="" name="lng"
+                           value="">
                     <div class="form-group">
                         <button type="submit" class="btn btn-primary">Simpan</button>
                     </div>
@@ -69,7 +74,7 @@
         <div class="col-lg-6">
             @if ($edit)
                 <div class="card card-block">
-                    <form role="form" action="" method="post" enctype="multipart/form-data">
+                    <form role="form" action="{{ route('user.undangan.kirim-ulang', ['id'=>$undangan->id]) }}" method="post" enctype="multipart/form-data">
                         {{csrf_field()}}
                         <div class="form-group">
                             <label for="exampleInputPassword1">Tamu Undangan</label>
@@ -83,14 +88,14 @@
                         </div>
                         <input id="inputFile" type="file" name="berkas" style="display: none" class="dz-message-block">
                         <div class="form-group">
-                            <button type="submit" class="btn btn-primary">Simpan</button>
+                            <button type="submit" class="btn btn-primary">Kirim Ulang</button>
                         </div>
                     </form>
                 </div>
             @endif
             <div class="card card-block">
                 @if($edit)
-                    <form role="form" action="" method="post">
+                    <form role="form" action="{{ route('user.undangan.tambah-penerima', ['id'=>$undangan->id]) }}" method="post">
                         {{csrf_field()}}
                         @endif
                         <div class="form-group">
@@ -105,7 +110,7 @@
                                       name="email_tamu"></textarea>
                         </div>
                         <div class="form-group">
-                            <button type="submit" class="btn btn-primary">Kirim Undangan</button>
+                            <button type="submit" class="btn btn-primary">{{ $edit ? 'Tambah Pengirim' : 'Kirim Undangan' }}</button>
                         </div>
                     </form>
             </div>
@@ -114,12 +119,54 @@
 @endsection
 
 @push('js')
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCiDdGyp6n2hKHPECuB6JZIT-8dVHCpwI0&language=id&region=ID"></script>
     <script>
+
+        var defaultCenter = {
+            lat : -8.251889,
+            lng : 115.076818
+        };
+
+        function initMap() {
+
+            var map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 10,
+                center: defaultCenter
+            });
+
+            var marker = new google.maps.Marker({
+                position: defaultCenter,
+                map: map,
+                title: 'Click to zoom',
+                draggable:true
+            });
+
+
+            marker.addListener('drag', handleEvent);
+            marker.addListener('dragend', handleEvent);
+
+            var infowindow = new google.maps.InfoWindow({
+                content: '<h4>Drag untuk pindah lokasi</h4>'
+            });
+
+            infowindow.open(map, marker);
+        }
+
+        function handleEvent(event) {
+            document.getElementById('lat').value = event.latLng.lat();
+            document.getElementById('lng').value = event.latLng.lng();
+        }
+
+
         @if(Session::has('success'))
         swal({
             icon: "success",
             title: "{{Session::get('success')}}"
         });
         @endif
+
+        $(function(){
+            initMap();
+        })
     </script>
 @endpush

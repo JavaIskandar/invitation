@@ -24,11 +24,13 @@ class SignUpController extends Controller
             return back()->with('message', 'Konfirmasi password tidak sama');
         }
 
-        //dd($request->jenis_kelamin);
+        $email = ''.$request->email;
+
+//        dd($email);
 
         $user = User::create([
             'nama' => $request->nama,
-            'email' => $request->email,
+            'email' => $email,
             'jenis_kelamin' => $request->jenis_kelamin,
             'tanggal_lahir' => $request->tanggal_lahir,
             'password' => bcrypt($request->password)

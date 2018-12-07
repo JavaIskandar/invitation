@@ -46,7 +46,16 @@ class UndanganPageController extends Controller
         ]);
     }
 
-    public function showListUndangan(){
+    public function showDetailUndangan(Request $request){
+        $idUndangan = decrypt($request->undangan);
+        $idTamu = decrypt($request->id);
 
+        $undangan = Undangan::find($idUndangan);
+        $tamu = Undangan::find($idTamu);
+
+        return view('tamu.detail_undangan', [
+            'undangan' => $undangan,
+            'tamu' => $tamu
+        ]);
     }
 }

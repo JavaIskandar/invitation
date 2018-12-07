@@ -8,8 +8,8 @@
     <form id="login-form" action="{{ route('user.login.proses') }}" method="POST">
         {{ csrf_field() }}
         <div class="form-group">
-            <label for="username">NIP/NIDN</label>
-            <input type="number" class="form-control underlined" name="id" id="username" placeholder="Masukkan NIP atau NIDN" required> </div>
+            <label for="username">Email</label>
+            <input type="email" class="form-control underlined" name="email" id="username" placeholder="Masukkan email" required> </div>
         <div class="form-group">
             <label for="password">Password</label>
             <input type="password" class="form-control underlined" name="password" id="password" placeholder="Masukkan password" required> </div>

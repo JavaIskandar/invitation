@@ -13,7 +13,7 @@ Route::namespace('Auth')->group(function () {
     ]);
 
     Route::post('login', [
-        'uses' => 'LoginController@login',
+        'uses' => 'LoginController@authenticate',
         'as' => 'user.login.proses'
     ]);
 
@@ -27,7 +27,7 @@ Route::namespace('Auth')->group(function () {
         'as' => 'user.sign-up.proses'
     ]);
 
-    Route::post('logout', [
+    Route::get('logout', [
         'uses' => 'LoginController@logout',
         'as' => 'user.logout'
     ]);
@@ -87,6 +87,10 @@ Route::namespace('Page')->group(function () {
         'uses' => 'UndanganPageController@showFormEdit',
         'as' => 'user.undangan.edit'
     ]);
+    Route::get('detail-undangan/{undangan}/{id}', [
+        'uses' => 'UndanganPageController@showDetailUndangan',
+        'as' => 'tamu.undangan.detail'
+    ]);
 });
 
 Route::post('buat-undangan', [
@@ -94,15 +98,25 @@ Route::post('buat-undangan', [
     'as' => 'user.undangan.buat.proses'
 ]);
 
-Route::post('ubah/undangan/{id}', [
+Route::post('ubah/deskripsi/', [
     'uses' => 'UndanganController@editDeskripsiUndangan',
     'as' => 'user.undangan.edit.deskripsi'
 ]);
 
-Route::post('ubah/undangan/', [
-    'uses' => 'undanganController@editTamuUndangan',
-    'as' => 'user.undangan.edit.tamu'
+Route::post('ubah/kirim-ulang/', [
+    'uses' => 'UndanganController@kirimUlangUndangan',
+    'as' => 'user.undangan.kirim-ulang'
 ]);
+
+Route::post('ubah/tambah-penerima/', [
+    'uses' => 'UndanganController@tambahPenerimaUndangan',
+    'as' => 'user.undangan.tambah-penerima'
+]);
+
+//Route::post('ubah/undangan/', [
+//    'uses' => 'undanganController@editTamuUndangan',
+//    'as' => 'user.undangan.edit.tamu'
+//]);
 
 Route::post('ubah/katasandi', [
     'uses' => 'PengaturanController@ubahKataSandi',

@@ -43,17 +43,7 @@
                 </div>
                 <nav class="menu">
                     <ul class="sidebar-menu metismenu" id="sidebar-menu">
-                        {{--@if(Auth::check())--}}
-                            {{--@if(Auth::user()->role == App\Support\Role::ROOT)--}}
-                                {{--@include('layouts.menu.root')--}}
-                            {{--@elseif(Auth::user()->role == App\Support\Role::ADMIN)--}}
-                                {{--@include('layouts.menu.admin')--}}
-                            {{--@else--}}
-                                {{--@include('layouts.menu.kasublab')--}}
-                            {{--@endif--}}
-                        {{--@else--}}
-                            {{--@include('layouts.menu.mahasiswa')--}}
-                        {{--@endif--}}
+                        <li><a href="{{ route('user.logout') }}">Logout</a></li>
                     </ul>
                 </nav>
             </div>
