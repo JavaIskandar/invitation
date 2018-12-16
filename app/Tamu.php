@@ -17,6 +17,6 @@ class Tamu extends Model
     }
 
     public function getUndangan($query = true){
-        return $query ? $this->belongsTo('App\Undangna', 'undangan_id') : $this->belongsTo('App\Undangna', 'undangan_id')->first();
+        return $query ? $this->belongsTo('App\Undangan', 'undangan_id') : $this->belongsTo('App\Undangan', 'undangan_id')->first();
     }
 }

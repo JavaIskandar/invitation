@@ -9,7 +9,7 @@ class Undangan extends Model
     protected $table = 'undangan';
 
     protected $fillable = [
-        'user_id', 'nama_agenda', 'nama_pengirim', 'alamat', 'tanggal', 'jam', 'keterangan', 'created_at', 'updated_at'
+        'user_id', 'nama_agenda', 'nama_pengirim', 'alamat', 'tanggal', 'jam', 'keterangan', 'created_at', 'updated_at', 'lat', 'lng'
     ];
 
     public function getUser($query = true){

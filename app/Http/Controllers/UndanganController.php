@@ -7,17 +7,25 @@ use App\Tamu;
 use App\Undangan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Mail;
+use BaconQrCode\Writer;
+use Barryvdh\DomPDF\Facade as PDF;
+use App;
 
 class UndanganController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth');
+        $this->middleware('auth')->only([
+            'buatUndangan', 'kirimUlangUndangan', 'tambahPenerimaUndangan', 'editDeskripsiUndangan'
+        ]);
     }
 
     public function buatUndangan(Request $request)
     {
+        $lat = $request->lat;
+        $lng = $request->lng;
         $undangan = Undangan::create([
             'user_id' => Auth::user()->id,
             'nama_agenda' => $request->nama_agenda,
@@ -25,19 +33,28 @@ class UndanganController extends Controller
             'alamat' => $request->alamat,
             'tanggal' => $request->tanggal,
             'jam' => $request->jam,
-            'keterangan' => $request->keterangan
+            'keterangan' => $request->keterangan,
+            'lat' => $lat,
+            'lng' => $lng
         ]);
-
         $tamuArray = explode("\n", $request->email_tamu);
 
         foreach ($tamuArray as $tamu){
-            $email = trim(preg_replace('/\s\s+/', ' ', $tamu->email));
+            $email = trim(preg_replace('/\s\s+/', ' ', $tamu));
             if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 return back()->with('error', 'Invalid email format');
             }
         }
 
-        foreach ($tamuArray as $tamu) {
+        foreach ($tamuArray as $item) {
+
+            $tamu = Tamu::create([
+                'undangan_id' => $undangan->id,
+                'konfirmasi_undangan' => false,
+                'konfirmasi_kedatangan' => false,
+                'email' => $item
+            ]);
+
             $data = [
                 'nama_agenda' => $request->nama_agenda,
                 'nama_pengirim' => $request->nama_pengirim,
@@ -49,13 +66,6 @@ class UndanganController extends Controller
 
             $email = trim(preg_replace('/\s\s+/', ' ', $tamu->email));
             Mail::to($email)->send(new EmailUndangan($data));
-
-            Tamu::create([
-                'undangan_id' => $undangan->id,
-                'konfirmasi_undangan' => false,
-                'konfirmasi_kedatangan' => false,
-                'email' => $tamu
-            ]);
         }
 
         return redirect()->route('user.dashboard');
@@ -123,20 +133,58 @@ class UndanganController extends Controller
     }
 
     public function editDeskripsiUndangan(Request $request){
-        $undangan = Undangan::update([
-            'user_id' => Auth::user()->id,
+        $undangan = Undangan::find($request->id);
+        $undangan->update([
             'nama_agenda' => $request->nama_agenda,
             'nama_pengirim' => $request->nama_pengirim,
             'alamat' => $request->alamat,
             'tanggal' => $request->tanggal,
             'jam' => $request->jam,
-            'keterangan' => $request->keterangan
+            'keterangan' => $request->keterangan,
+            'lat' => $request->lat,
+            'lng' => $request->lng
         ]);
         return redirect()->route('user.dashboard');
     }
 
-    public function konfirmasiKedatangan(){
+    public function konfirmasiKedatangan(Request $request){
+        $tamu = Tamu::find(decrypt($request->id));
+        $tamu->konfirmasi_undangan = true;
+        $tamu->save();
 
+        return $this->unduhSurat($tamu->id);
     }
 
+    public function unduhSurat($id){
+        $renderer = new \BaconQrCode\Renderer\Image\Png();
+        $renderer->setHeight(256);
+        $renderer->setWidth(256);
+        $writer = new \BaconQrCode\Writer($renderer);
+        $qrName = $id;
+        $val = route('tamu.verifikasi', ['id' => $id]);
+        $writer->writeFile($val, 'images/qrCode/'.$qrName.'.png');
+
+        $tamu = Tamu::find($id);
+        $undangan = $tamu->getUndangan(false);
+
+
+        $d = PDF::loadView('tamu.undangan', [
+            'undangan' => $undangan,
+            'tamu' => $tamu,
+            'verifikasi' => false
+        ])->download('Invitation '.$id.'.pdf');
+
+        File::delete(public_path('images/qrCode/'.$qrName.'.png'));
+
+        return $d;
+    }
+
+    public function tampilQr($id)
+    {
+        try {
+            return response()->file(storage_path('app/public/qrCode/images/' . $id . '.png'));
+        } catch (ModelNotFoundException $err) {
+            return 'Tidak dapat menemukan qr code';
+        }
+    }
 }

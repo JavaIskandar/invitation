@@ -51,11 +51,21 @@ class UndanganPageController extends Controller
         $idTamu = decrypt($request->id);
 
         $undangan = Undangan::find($idUndangan);
-        $tamu = Undangan::find($idTamu);
-
+        $tamu = Tamu::find($idTamu);
         return view('tamu.detail_undangan', [
             'undangan' => $undangan,
             'tamu' => $tamu
+        ]);
+    }
+
+    public function showVerifikasiUndangan(Request $request){
+        $tamu = Tamu::find($request->id);
+        $undangan = $tamu->getUndangan(false);
+
+        return view('tamu.undangan', [
+            'undangan' => $undangan,
+            'tamu' => $tamu,
+            'verifikasi' => true
         ]);
     }
 }
