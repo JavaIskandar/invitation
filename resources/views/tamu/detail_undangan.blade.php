@@ -26,18 +26,23 @@
                         <label for="exampleInputEmail1">Deskripsi Acara</label>
                     </div>
                     <div class="form-group">
+                        <label for="nama-agenda">ID Acara</label>
+                        <span id="nama-agenda">{{ $undangan->id}}
+                        </span>
+                    </div>
+                    <div class="form-group">
                         <label for="nama-agenda">Nama Acara</label>
-                        <span id="nama-agenda">{{ $undangan->nama_agenda}}"
+                        <span id="nama-agenda">{{ $undangan->nama_agenda}}
                         </span>
                     </div>
                     <div class="form-group">
                         <label for="nama-pengirim">Nama_Pengirim</label>
-                        <span id="nama-pengirim">{{  $undangan->nama_pengirim }}"
+                        <span id="nama-pengirim">{{  $undangan->nama_pengirim }}
                         </span>
                     </div>
                     <div class="form-group">
                         <label for="alamat">Alamat</label>
-                        <span id="alamat">{{ $undangan->alamat }}"</span>
+                        <span id="alamat">{{ $undangan->alamat }}</span>
                     </div>
                     <div class="form-group">
                         <label for="tanggal">Tanggal</label>
@@ -45,7 +50,7 @@
                     </div>
                     <div class="form-group">
                         <label for="jam">Pukul</label>
-                        <span  id="jam">{{ $undangan->jam }}"</span>
+                        <span id="jam">{{ $undangan->jam }}</span>
                     </div>
                     <div class="form-group">
                         <label for="keterangan">Keterangan</label>
@@ -56,13 +61,16 @@
                     <input type="number" class="form-control" id="lng" placeholder="" name="lng"
                            value="" hidden>
                     <div class="form-group">
-                        <a href="" class="btn btn-primary">konfirmasi kedatangan</a>
+                        <a href="{{ route('tamu.konfirmasi', ['id' => encrypt($tamu->id)]) }}" class="btn btn-primary">konfirmasi
+                            dan unduh undangan</a>
                     </div>
                 </div>
             </div>
         </div>
         <div class="col-lg-6">
-            <div class="col-lg-12" id="map" style="height: 300px;"></div>
+            @if($undangan->lat != null)
+                <div class="col-lg-12" id="map" style="height: 300px;"></div>
+            @endif
         </div>
     </div>
 @endsection
@@ -72,8 +80,8 @@
     <script>
 
         var defaultCenter = {
-            lat : -8.251889,
-            lng : 115.076818
+            lat: {{ !is_null($undangan->lat) ? $undangan->lat : '-8.251889' }},
+            lng: {{ !is_null($undangan->lat) ? $undangan->lng : '115.076818' }}
         };
 
         function initMap() {
@@ -87,15 +95,11 @@
                 position: defaultCenter,
                 map: map,
                 title: 'Click to zoom',
-                draggable:true
+                draggable: false
             });
 
-
-            marker.addListener('drag', handleEvent);
-            marker.addListener('dragend', handleEvent);
-
             var infowindow = new google.maps.InfoWindow({
-                content: '<h4>Drag untuk pindah lokasi</h4>'
+                content: '<h4>Tempat Acara</h4>'
             });
 
             infowindow.open(map, marker);
@@ -114,7 +118,7 @@
         });
         @endif
 
-        $(function(){
+        $(function () {
             initMap();
         })
     </script>

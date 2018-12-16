@@ -91,6 +91,10 @@ Route::namespace('Page')->group(function () {
         'uses' => 'UndanganPageController@showDetailUndangan',
         'as' => 'tamu.undangan.detail'
     ]);
+    Route::get('verifikasi-undangan/{id}', [
+        'uses' => 'UndanganPageController@showVerifikasiUndangan',
+        'as' => 'tamu.verifikasi'
+    ]);
 });
 
 Route::post('buat-undangan', [
@@ -111,6 +115,21 @@ Route::post('ubah/kirim-ulang/', [
 Route::post('ubah/tambah-penerima/', [
     'uses' => 'UndanganController@tambahPenerimaUndangan',
     'as' => 'user.undangan.tambah-penerima'
+]);
+
+Route::get('konfirmasi-undangan/{id}', [
+    'uses' => 'UndanganController@konfirmasiKedatangan',
+    'as' => 'tamu.konfirmasi'
+]);
+
+Route::get('get-geocode', [
+    'uses' => 'GeocodeSearch@action',
+    'as' => 'get-geocode'
+]);
+
+Route::get('get-reverse-geocode', [
+    'uses' => 'ReverseGeocodeSearch@action',
+    'as' => 'get-reverse-geocode'
 ]);
 
 //Route::post('ubah/undangan/', [

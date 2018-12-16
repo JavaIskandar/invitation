@@ -43,6 +43,8 @@
                         <label for="alamat">Alamat</label>
                         <input type="text" class="form-control" id="alamat" placeholder="" name="alamat"
                                value="{{ $edit ? $undangan->alamat : '' }}">
+                        <button type="button" onclick="getGeocode()" class="btn btn-primary">GeoCode</button>
+                        <button type="button" onclick="getReverseGeocode()" class="btn btn-primary">Reverse GeoCode</button>
                     </div>
                     <div class="form-group">
                         <label for="tanggal">Tanggal</label>
@@ -59,14 +61,16 @@
                         <textarea class="form-control" id="keterangan" placeholder=""
                                   name="keterangan">{{ $edit ? $undangan->keterangan : '' }}</textarea>
                     </div>
-                    <input type="number" class="form-control" id="lat" placeholder="" name="lat"
-                           value="">
-                    <input type="number" class="form-control" id="lng" placeholder="" name="lng"
-                           value="">
-                    <div class="form-group">
-                        <button type="submit" class="btn btn-primary">Simpan</button>
-                    </div>
+                    <input type="text" class="form-control" id="lat" placeholder="" name="lat"
+                           value="{{ $edit ? $undangan->lat : '' }}" hidden>
+                    <input type="text" class="form-control" id="lng" placeholder="" name="lng"
+                           value="{{ $edit ? $undangan->lng : '' }}" hidden>
                     @if($edit)
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary">Simpan</button>
+                        </div>
+                        <input type="number" class="form-control" id="id" placeholder="" name="id"
+                               value="{{ $edit ? $undangan->id : '' }}" hidden>
                 </form>
                 @endif
             </div>
@@ -74,7 +78,8 @@
         <div class="col-lg-6">
             @if ($edit)
                 <div class="card card-block">
-                    <form role="form" action="{{ route('user.undangan.kirim-ulang', ['id'=>$undangan->id]) }}" method="post" enctype="multipart/form-data">
+                    <form role="form" action="{{ route('user.undangan.kirim-ulang', ['id'=>$undangan->id]) }}"
+                          method="post" enctype="multipart/form-data">
                         {{csrf_field()}}
                         <div class="form-group">
                             <label for="exampleInputPassword1">Tamu Undangan</label>
@@ -95,7 +100,8 @@
             @endif
             <div class="card card-block">
                 @if($edit)
-                    <form role="form" action="{{ route('user.undangan.tambah-penerima', ['id'=>$undangan->id]) }}" method="post">
+                    <form role="form" action="{{ route('user.undangan.tambah-penerima', ['id'=>$undangan->id]) }}"
+                          method="post">
                         {{csrf_field()}}
                         @endif
                         <div class="form-group">
@@ -110,7 +116,8 @@
                                       name="email_tamu"></textarea>
                         </div>
                         <div class="form-group">
-                            <button type="submit" class="btn btn-primary">{{ $edit ? 'Tambah Pengirim' : 'Kirim Undangan' }}</button>
+                            <button type="submit"
+                                    class="btn btn-primary">{{ $edit ? 'Tambah Pengirim' : 'Kirim Undangan' }}</button>
                         </div>
                     </form>
             </div>
@@ -123,9 +130,11 @@
     <script>
 
         var defaultCenter = {
-            lat : -8.251889,
-            lng : 115.076818
+            lat: {{ $edit ? $undangan->lat : '-8.251889' }},
+            lng: {{ $edit ? $undangan->lng : '115.076818' }}
         };
+
+        var marker;
 
         function initMap() {
 
@@ -134,11 +143,11 @@
                 center: defaultCenter
             });
 
-            var marker = new google.maps.Marker({
+            marker = new google.maps.Marker({
                 position: defaultCenter,
                 map: map,
                 title: 'Click to zoom',
-                draggable:true
+                draggable: true
             });
 
 
@@ -157,6 +166,45 @@
             document.getElementById('lng').value = event.latLng.lng();
         }
 
+        function getReverseGeocode() {
+
+            var lat = $('#lat').val();
+            var lng = document.getElementById('lng').value;
+            $.ajax({
+                url: "{{ route('get-reverse-geocode') }}",
+                method: 'GET',
+                data: {
+                    lat: lat,
+                    lng: lng
+                },
+                dataType: 'json',
+                success: function (data) {
+                    // alert(data['lat']);
+                    // $('#lat').text(data['lat']);
+                    document.getElementById('alamat').value = data;
+
+                }
+            });
+        }
+
+        function getGeocode() {
+            var query = document.getElementById('alamat').value;
+            $.ajax({
+                url: "{{ route('get-geocode') }}",
+                method: 'GET',
+                data: {query: query},
+                dataType: 'json',
+                success: function (data) {
+                    // alert(data['lat']);
+                    // $('#lat').text(data['lat']);
+                    document.getElementById('lat').value = data['lat'];
+                    document.getElementById('lng').value = data['lon'];
+
+                    var latlng = new google.maps.LatLng(data['lat'], data['lon']);
+                    marker.setPosition(latlng);
+                }
+            });
+        }
 
         @if(Session::has('success'))
         swal({
@@ -165,7 +213,7 @@
         });
         @endif
 
-        $(function(){
+        $(function () {
             initMap();
         })
     </script>
