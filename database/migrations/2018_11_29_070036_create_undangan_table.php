@@ -24,6 +24,8 @@ class CreateUndanganTable extends Migration
                 ->onDelete('SET NULL');
             $table->string('nama_agenda');
             $table->string('nama_pengirim');
+            $table->bigInteger('lat');
+            $table->bigInteger('lng');
             $table->string('alamat');
             $table->string('tanggal');
             $table->time('jam');
