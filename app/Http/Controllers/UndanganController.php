@@ -77,7 +77,7 @@ class UndanganController extends Controller
         $tamu = $undangan->getTamu(false);
 
         foreach ($tamu as $item){
-            $email = trim(preg_replace('/\s\s+/', ' ', $tamu->email));
+            $email = trim(preg_replace('/\s\s+/', ' ', $item->email));
             if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 return back()->with('error', 'Invalid email format');
             }
@@ -102,31 +102,31 @@ class UndanganController extends Controller
 
         $tamuArray = explode("\n", $request->email_tamu);
 
-        foreach ($tamuArray as $tamu){
-            $email = trim(preg_replace('/\s\s+/', ' ', $tamu));
+        foreach ($tamuArray as $item){
+            $email = trim(preg_replace('/\s\s+/', ' ', $item));
             if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 return back()->with('error', 'Invalid email format');
             }
         }
 
-        foreach ($tamuArray as $tamu) {
+        foreach ($tamuArray as $item) {
 
-            Tamu::create([
+            $tamu = Tamu::create([
                 'undangan_id' => $request->id,
                 'konfirmasi_undangan' => false,
                 'konfirmasi_kedatangan' => false,
-                'email' => $tamu
+                'email' => $item
             ]);
 
             $data = [
                 'nama_agenda' => $request->nama_agenda,
                 'nama_pengirim' => $request->nama_pengirim,
-                'tamu' => $tamu,
+                'tamu' => $item,
                 'tanggal' => $request->tanggal,
                 'undangan_id' => $request->id,
                 'tamu_id' => $tamu->id
             ];
-            Mail::to('iskandarjava@yahoo.co.id')->send(new EmailUndangan($data));
+            Mail::to($item)->send(new EmailUndangan($data));
         }
 
         return redirect()->route('user.dashboard');
@@ -148,6 +148,13 @@ class UndanganController extends Controller
     }
 
     public function konfirmasiKedatangan(Request $request){
+        $tamu = Tamu::find(decrypt($request->id));
+        $tamu->konfirmasi_kedatangan = true;
+        $tamu->save();
+        return back();
+    }
+
+    public function konfirmasiUndangan(Request $request){
         $tamu = Tamu::find(decrypt($request->id));
         $tamu->konfirmasi_undangan = true;
         $tamu->save();

@@ -26,6 +26,16 @@
                         </span>
                 </div>
                 <div class="form-group">
+                    <label for="nama-agenda">ID Tamu</label>
+                    <span id="nama-agenda">{{ $tamu->id}}
+                        </span>
+                </div>
+                <div class="form-group">
+                    <label for="nama-agenda">Email Tamu</label>
+                    <span id="nama-agenda">{{ $tamu->email}}
+                        </span>
+                </div>
+                <div class="form-group">
                     <label for="nama-agenda">Nama Acara</label>
                     <span id="nama-agenda">{{ $undangan->nama_agenda}}
                         </span>
@@ -58,5 +68,12 @@
         <div class="col-lg-6">
             <img style="height: 150px; margin-left: 20px" src="{{ asset('images/qrCode/'.$tamu->id.'.png') }}"/>
         </div>
+    @else
+        @if($tamu->konfirmasi_kedatangan == false)
+            <h5>Konfirmasi kedatangan hanya dilakukan oleh petugas acara</h5>
+            <a href="{{ route('tamu.konfirmasi-kedatangan', ['id' => encrypt($tamu->id)]) }}">Konfirmasi Kedatangan</a>
+            @else
+            <h5>Anda sudah melakukan konfirmasi kedatangan</h5>
+        @endif
     @endif
 </div>

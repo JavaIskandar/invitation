@@ -61,7 +61,7 @@
                     <input type="number" class="form-control" id="lng" placeholder="" name="lng"
                            value="" hidden>
                     <div class="form-group">
-                        <a href="{{ route('tamu.konfirmasi', ['id' => encrypt($tamu->id)]) }}" class="btn btn-primary">konfirmasi
+                        <a href="{{ route('tamu.konfirmasi-undangan', ['id' => encrypt($tamu->id)]) }}" class="btn btn-primary">konfirmasi
                             dan unduh undangan</a>
                     </div>
                 </div>

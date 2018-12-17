@@ -118,8 +118,13 @@ Route::post('ubah/tambah-penerima/', [
 ]);
 
 Route::get('konfirmasi-undangan/{id}', [
+    'uses' => 'UndanganController@konfirmasiUndangan',
+    'as' => 'tamu.konfirmasi-undangan'
+]);
+
+Route::get('konfirmasi-kedatangan/{id}', [
     'uses' => 'UndanganController@konfirmasiKedatangan',
-    'as' => 'tamu.konfirmasi'
+    'as' => 'tamu.konfirmasi-kedatangan'
 ]);
 
 Route::get('get-geocode', [
